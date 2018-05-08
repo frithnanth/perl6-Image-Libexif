@@ -199,7 +199,7 @@ use Image::Libexif::Constants;
 
 =head1 DESCRIPTION
 
-For more details on libexif see L<https://>.
+For more details on libexif see L<https://github.com/libexif>.
 
 =head1 Prerequisites
 
@@ -212,17 +212,14 @@ instructions below based on your platform:
 sudo apt-get install libexif12
 =end code
 
-The module looks for a library called libexif.so, or whatever it finds in
-the environment variable B<PERL6_LIBEXIF_LIB> (provided that the library one
-chooses uses the same API).
+The module looks for a library called libexif.so.
 
 =head1 Installation
 
 To install it using zef (a module management tool):
 
 =begin code
-$ zef update
-$ zef install Image::Libexif::Raw
+$ zef install Image::Libexif
 =end code
 
 =head1 Testing

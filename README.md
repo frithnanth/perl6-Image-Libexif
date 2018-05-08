@@ -1,6 +1,6 @@
 ## Image::Libexif
 
-Image::Libexif - .
+Image::Libexif - An interface to libexif.
 
 ## Build Status
 
@@ -17,19 +17,11 @@ For more examples see the `example` directory.
 
 ## Description
 
+Image::Libexif provides an interface to libexif and allows you to access the EXIF records of an image.
 
 ## Documentation
 
 #### new()
-
-
-### Errors
-
-When the underlying library returns an error condition, the methods will return a Failure object, which can
-be trapped and the exception can be analyzed and acted upon.
-
-The exception object has two fields: $errno and $error, and return a message stating the error number and
-the associated message as delivered by libarchive.
 
 ## Prerequisites
 This module requires the libexif library to be installed. Please follow the instructions below based on your platform:
@@ -40,9 +32,7 @@ This module requires the libexif library to be installed. Please follow the inst
 sudo apt-get install libexif12
 ```
 
-The module looks for a library called libexif.so, or whatever it finds in
-the environment variable `PERL6_LIBEXIF_LIB` (provided that the library one
-chooses uses the same API).
+The module looks for a library called libexif.so.
 
 ## Installation
 
@@ -50,7 +40,7 @@ To install it using zef (a module management tool):
 
 ```
 $ zef update
-$ zef install Archive::Libarchive
+$ zef install Image::Libexif
 ```
 
 ## Testing
