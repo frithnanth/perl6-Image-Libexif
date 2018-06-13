@@ -58,23 +58,41 @@ subtest {
   is exif_format_get_size(EXIF_FORMAT_RATIONAL), 8, 'format size';
 }, 'tags in ifd0';
 
-my @collected;
-sub callback(ExifEntry $entry, Pointer[void] $dummy) {
-  -> ExifEntry $entry, Str $data {
-    my Buf $buf .= allocate: 100, 0;
-    @collected.push: "$data: " ~ exif_entry_get_value($entry, $buf, 100);
-  }($entry, $file);
-}
-my Pointer[void] $dummy .= new;
-my ExifContent $content = $exif.ifd0;
-exif_content_foreach_entry($content, &callback, $dummy);
-is @collected.head, 't/sample01.jpg: FUJIFILM', 'exif_content_foreach_entry';
+subtest {
+  my $content1 = exif_content_new;
+  is $content1.WHAT, Image::Libexif::Raw::ExifContent, 'new content';
 
-my ExifEntry $entry1 = exif_entry_new();
-ok ($entry1.defined && $entry1.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'new entry';
-exif_entry_initialize($entry1, EXIF_TAG_IMAGE_DESCRIPTION);
-ok (($entry1.tag, $entry1.format, $entry1.components, $entry1.size).all == 0), 'entry initialization';
-exif_entry_free($entry1);
+  my @collected;
+  sub callback(ExifEntry $entry, Pointer[void] $dummy) {
+    -> ExifEntry $entry, Str $data {
+      my Buf $buf .= allocate: 100, 0;
+      @collected.push: "$data: " ~ exif_entry_get_value($entry, $buf, 100);
+    }($entry, $file);
+  }
+  my Pointer[void] $dummy .= new;
+  my ExifContent $content = $exif.ifd0;
+  exif_content_foreach_entry($content, &callback, $dummy);
+  is @collected.head, 't/sample01.jpg: FUJIFILM', 'exif_content_foreach_entry';
+
+  my ExifEntry $entryin = exif_entry_new();
+  exif_content_add_entry($content, $entryin);
+  exif_entry_initialize($entryin, EXIF_TAG_IMAGE_DESCRIPTION);
+  exif_set_short($entryin.data, EXIF_BYTE_ORDER_INTEL, 1);
+  my ExifEntry $entryout = exif_content_get_entry($content, EXIF_TAG_IMAGE_DESCRIPTION);
+  ok ($entryout.defined && $entryout.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'get entry';
+  ok exif_get_short($entryout.data, EXIF_BYTE_ORDER_INTEL) == 1, 'set and get tag';
+  exif_content_remove_entry($content, $entryin);
+  $entryout = exif_content_get_entry($content, EXIF_TAG_IMAGE_DESCRIPTION);
+  ok ! $entryout.defined, 'exif_content_remove_entry';
+}, 'exifcontent';
+
+subtest {
+  my ExifEntry $entry1 = exif_entry_new();
+  ok ($entry1.defined && $entry1.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'new entry';
+  exif_entry_initialize($entry1, EXIF_TAG_IMAGE_DESCRIPTION);
+  ok (($entry1.tag, $entry1.format, $entry1.components, $entry1.size).all == 0), 'entry initialization';
+  exif_entry_free($entry1);
+}, 'entry';
 
 subtest {
   my $mnote = exif_data_get_mnote_data($exif);
@@ -96,6 +114,8 @@ subtest {
   is exif_log_code_get_title(EXIF_LOG_CODE_CORRUPT_DATA), 'Corrupt data', 'get log title';
   is exif_log_code_get_message(EXIF_LOG_CODE_CORRUPT_DATA), 'The data provided does not follow the specification.',
       'get log message';
+  my ExifContent $content = $exif.ifd0;
+  exif_content_log($content, $log);
   exif_log_free($log);
 }, 'log';
 

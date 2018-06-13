@@ -62,13 +62,22 @@ sub exif_data_set_data_type(ExifData $exif, int32 $datatype) is native(LIB) is e
 sub exif_data_get_data_type(ExifData $exif --> int32) is native(LIB) is export { * }
 sub exif_data_log(ExifData $exif, ExifLog $log) is native(LIB) is export { * }
 
+sub exif_content_new(--> ExifContent) is native(LIB) is export { * }
+sub exif_content_ref(ExifContent $content) is native(LIB) is export { * }
+sub exif_content_unref(ExifContent $content) is native(LIB) is export { * }
+sub exif_content_free(ExifContent $content) is native(LIB) is export { * }
+sub exif_content_add_entry(ExifContent $content, ExifEntry $entry) is native(LIB) is export { * }
+sub exif_content_get_entry(ExifContent $content, uint32 $tag --> ExifEntry) is native(LIB) is export { * }
+sub exif_content_remove_entry(ExifContent $content, ExifEntry $entry) is native(LIB) is export { * }
+sub exif_content_fix(ExifContent $content) is native(LIB) is export { * }
+sub exif_content_log(ExifContent $content, ExifLog $log) is native(LIB) is export { * }
+
 sub exif_entry_new(--> ExifEntry) is native(LIB) is export { * }
 sub exif_entry_ref(ExifEntry $entry) is native(LIB) is export { * }
 sub exif_entry_unref(ExifEntry $entry) is native(LIB) is export { * }
 sub exif_entry_free(ExifEntry $entry) is native(LIB) is export { * }
 sub exif_entry_initialize(ExifEntry $entry, uint32 $tag) is native(LIB) is export { * }
 sub exif_entry_fix(ExifEntry $entry) is native(LIB) is export { * }
-sub exif_content_get_entry(ExifContent $content, uint32 $tag --> ExifEntry) is native(LIB) is export { * }
 sub exif_entry_get_value(ExifEntry $entry, Buf $val, uint32 $maxlen --> Str) is native(LIB) is export { * }
 sub exif_entry_dump(ExifEntry $entry, uint32 $indent) is native(LIB) is export { * }
 
@@ -115,6 +124,15 @@ sub exif_loader_reset(ExifLoader $l) is native(LIB) is export { * }
 sub exif_loader_get_data(ExifLoader $l --> ExifData) is native(LIB) is export { * }
 sub exif_loader_get_buf(ExifLoader $l, Pointer[uint8] $d is rw, uint32 $ds is rw) is native(LIB) is export { * }
 sub exif_loader_log(ExifLoader $l, ExifLog $log) is native(LIB) is export { * }
+
+sub exif_set_short(Pointer[uint8] $data, uint16 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_sshort(Pointer[uint8] $data, int16 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_long(Pointer[uint8] $data, uint32 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_slong(Pointer[uint8] $data, int32 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_get_short(Pointer[uint8] $data, uint8 $value --> uint16) is native(LIB) is export { * }
+sub exif_get_sshort(Pointer[uint8] $data, uint8 $value --> int16) is native(LIB) is export { * }
+sub exif_get_long(Pointer[uint8] $data, uint8 $value --> uint32) is native(LIB) is export { * }
+sub exif_get_slong(Pointer[uint8] $data, uint8 $value --> int32) is native(LIB) is export { * }
 
 =begin pod
 
