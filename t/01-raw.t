@@ -9,27 +9,31 @@ use NativeCall;
 constant AUTHOR = ?%*ENV<TEST_AUTHOR>;
 
 my $file = 't/sample01.jpg';
-my ExifData $exif = exif_data_new();
-ok ($exif.defined && $exif.WHAT ~~ Image::Libexif::Raw::ExifData), 'initialization';
-$exif = exif_data_new_from_file($file);
-ok ($exif.defined && $exif.WHAT ~~ Image::Libexif::Raw::ExifData), 'initialization from file';
-my uint8 $ds;
-my Pointer[uint8] $d;
-exif_data_save_data($exif, $d, $ds);
-my $exif1 = exif_data_new_from_data($d, $ds);
-ok ($exif1.defined && $exif1.WHAT ~~ Image::Libexif::Raw::ExifData), 'initialization from memory data';
-is exif_byte_order_get_name(EXIF_BYTE_ORDER_MOTOROLA), 'Motorola', 'get byte order name';
-ok exif_data_get_byte_order($exif1) == EXIF_BYTE_ORDER_MOTOROLA, 'get exif data byte order';
-exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_INTEL);
-ok exif_data_get_byte_order($exif1) == EXIF_BYTE_ORDER_INTEL, 'set exif data byte order';
-is exif_ifd_get_name(EXIF_IFD_INTEROPERABILITY), 'Interoperability', 'get ifd name';
-is exif_content_get_ifd($exif1.ifd0), 0, 'read ifd';
-exif_data_free($exif1);
+my ExifData $exif;
 
 subtest {
-  ok exif_data_get_data_type($exif) == EXIF_DATA_TYPE_COUNT, 'get data type';
+  $exif = exif_data_new();
+  isa-ok $exif, Image::Libexif::Raw::ExifData, 'simple initialization';
+  $exif = exif_data_new_from_file($file);
+  isa-ok $exif, Image::Libexif::Raw::ExifData, 'initialization from file';
+  my uint8 $ds;
+  my Pointer[uint8] $d;
+  exif_data_save_data($exif, $d, $ds);
+  my $exif1 = exif_data_new_from_data($d, $ds);
+  isa-ok $exif1, Image::Libexif::Raw::ExifData, 'initialization from memory data';
+  is exif_byte_order_get_name(EXIF_BYTE_ORDER_MOTOROLA), 'Motorola', 'get byte order name';
+  cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_MOTOROLA, 'get exif data byte order';
+  exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_INTEL);
+  cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_INTEL, 'set exif data byte order';
+  is exif_ifd_get_name(EXIF_IFD_INTEROPERABILITY), 'Interoperability', 'get ifd name';
+  is exif_content_get_ifd($exif1.ifd0), 0, 'read ifd';
+  exif_data_free($exif1);
+}, 'initialization';
+
+subtest {
+  cmp-ok exif_data_get_data_type($exif), '==', EXIF_DATA_TYPE_COUNT, 'get data type';
   exif_data_set_data_type($exif, EXIF_DATA_TYPE_COMPRESSED);
-  ok exif_data_get_data_type($exif) == EXIF_DATA_TYPE_COMPRESSED, 'set data type';
+  cmp-ok exif_data_get_data_type($exif), '==', EXIF_DATA_TYPE_COMPRESSED, 'set data type';
 }, 'data type';
 
 subtest {
@@ -47,9 +51,9 @@ subtest {
 }, 'number of tags';
 subtest {
   my ExifEntry $entry = exif_content_get_entry($exif.ifd0, EXIF_TAG_MAKE);
-  ok ($entry.defined && $entry.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'get entry';
-  ok $entry.tag == EXIF_TAG_MAKE, 'tag number';
-  ok $entry.format == EXIF_FORMAT_ASCII, 'tag format';
+  isa-ok $entry, Image::Libexif::Raw::ExifEntry, 'get entry';
+  cmp-ok $entry.tag, '==', EXIF_TAG_MAKE, 'tag number';
+  cmp-ok $entry.format, '==', EXIF_FORMAT_ASCII, 'tag format';
   is $entry.components, 9, 'tag components';
   is $entry.size, $entry.components, 'tag size';
   my Buf $buf .= allocate: $entry.components, 0;
@@ -60,7 +64,7 @@ subtest {
 
 subtest {
   my $content1 = exif_content_new;
-  is $content1.WHAT, Image::Libexif::Raw::ExifContent, 'new content';
+  isa-ok $content1, Image::Libexif::Raw::ExifContent, 'new content';
 
   my @collected;
   sub callback(ExifEntry $entry, Pointer[void] $dummy) {
@@ -79,24 +83,24 @@ subtest {
   exif_entry_initialize($entryin, EXIF_TAG_IMAGE_DESCRIPTION);
   exif_set_short($entryin.data, EXIF_BYTE_ORDER_INTEL, 1);
   my ExifEntry $entryout = exif_content_get_entry($content, EXIF_TAG_IMAGE_DESCRIPTION);
-  ok ($entryout.defined && $entryout.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'get entry';
-  ok exif_get_short($entryout.data, EXIF_BYTE_ORDER_INTEL) == 1, 'set and get tag';
+  isa-ok $entryout, Image::Libexif::Raw::ExifEntry, 'get entry';
+  cmp-ok exif_get_short($entryout.data, EXIF_BYTE_ORDER_INTEL), '==', 1, 'set and get tag';
   exif_content_remove_entry($content, $entryin);
   $entryout = exif_content_get_entry($content, EXIF_TAG_IMAGE_DESCRIPTION);
-  ok ! $entryout.defined, 'exif_content_remove_entry';
+  nok $entryout.defined, 'exif_content_remove_entry';
 }, 'exifcontent';
 
 subtest {
   my ExifEntry $entry1 = exif_entry_new();
-  ok ($entry1.defined && $entry1.WHAT ~~ Image::Libexif::Raw::ExifEntry), 'new entry';
+  isa-ok $entry1, Image::Libexif::Raw::ExifEntry, 'new entry';
   exif_entry_initialize($entry1, EXIF_TAG_IMAGE_DESCRIPTION);
-  ok (($entry1.tag, $entry1.format, $entry1.components, $entry1.size).all == 0), 'entry initialization';
+  cmp-ok ($entry1.tag, $entry1.format, $entry1.components, $entry1.size).all, '==', 0, 'entry initialization';
   exif_entry_free($entry1);
 }, 'entry';
 
 subtest {
   my $mnote = exif_data_get_mnote_data($exif);
-  is $mnote.WHAT, Image::Libexif::Raw::ExifMnoteData, 'get mnote data';
+  isa-ok $mnote, Image::Libexif::Raw::ExifMnoteData, 'get mnote data';
   is exif_mnote_data_count($mnote), 33, 'mnote data count';
   is exif_mnote_data_get_description($mnote, 1), 'This number is unique and based on the date of manufacture.',
       'mnote data description';
@@ -110,7 +114,7 @@ subtest {
 
 subtest {
   my $log = exif_log_new();
-  is $log.WHAT, Image::Libexif::Raw::ExifLog, 'new log';
+  isa-ok $log, Image::Libexif::Raw::ExifLog, 'new log';
   is exif_log_code_get_title(EXIF_LOG_CODE_CORRUPT_DATA), 'Corrupt data', 'get log title';
   is exif_log_code_get_message(EXIF_LOG_CODE_CORRUPT_DATA), 'The data provided does not follow the specification.',
       'get log message';
@@ -137,15 +141,15 @@ subtest {
 
 subtest {
   my $el = exif_loader_new;
-  is $el.WHAT, Image::Libexif::Raw::ExifLoader, 'new ExifLoader';
+  isa-ok $el, Image::Libexif::Raw::ExifLoader, 'new ExifLoader';
   exif_loader_write_file($el, $file);
   my $exif2 = exif_loader_get_data($el);
-  ok ($exif2.defined && $exif2.WHAT ~~ Image::Libexif::Raw::ExifData), 'load and get data from file';
+  isa-ok $exif2, Image::Libexif::Raw::ExifData, 'load and get data from file';
   my Pointer[uint8] $buf .= new;
   my uint32 $len;
   exif_loader_get_buf($el, $buf, $len);
-  ok $len == 2118, 'buffer length';
-  ok $buf[^10] ~~ (69, 120, 105, 102, 0, 0, 73, 73, 42, 0), 'buffer content';
+  cmp-ok $len, '==', 2118, 'buffer length';
+  cmp-ok $buf[^10], '~~', (69, 120, 105, 102, 0, 0, 73, 73, 42, 0), 'buffer content';
 }, 'exifloader';
 
 if AUTHOR {
