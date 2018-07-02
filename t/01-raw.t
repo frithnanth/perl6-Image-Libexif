@@ -9,7 +9,7 @@ use NativeCall;
 constant AUTHOR = ?%*ENV<TEST_AUTHOR>;
 
 my $file = 't/sample01.jpg';
-my ExifData $exif;
+my ExifData ($exif, $exif1);
 
 subtest {
   $exif = exif_data_new();
@@ -17,10 +17,13 @@ subtest {
   $exif = exif_data_new_from_file($file);
   isa-ok $exif, Image::Libexif::Raw::ExifData, 'initialization from file';
   my uint8 $ds;
-  my Pointer[uint8] $d;
+  my Pointer $d;
   exif_data_save_data($exif, $d, $ds);
-  my $exif1 = exif_data_new_from_data($d, $ds);
+  $exif1 = exif_data_new_from_data($d, $ds);
   isa-ok $exif1, Image::Libexif::Raw::ExifData, 'initialization from memory data';
+}, 'initialization';
+
+subtest {
   is exif_byte_order_get_name(EXIF_BYTE_ORDER_MOTOROLA), 'Motorola', 'get byte order name';
   cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_MOTOROLA, 'get exif data byte order';
   exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_INTEL);
@@ -28,7 +31,7 @@ subtest {
   is exif_ifd_get_name(EXIF_IFD_INTEROPERABILITY), 'Interoperability', 'get ifd name';
   is exif_content_get_ifd($exif1.ifd0), 0, 'read ifd';
   exif_data_free($exif1);
-}, 'initialization';
+}, 'info';
 
 subtest {
   cmp-ok exif_data_get_data_type($exif), '==', EXIF_DATA_TYPE_COUNT, 'get data type';
@@ -49,6 +52,7 @@ subtest {
   is $exif.ifd3.count,  0, 'ifd3';
   is $exif.ifd4.count,  2, 'ifd4';
 }, 'number of tags';
+
 subtest {
   my ExifEntry $entry = exif_content_get_entry($exif.ifd0, EXIF_TAG_MAKE);
   isa-ok $entry, Image::Libexif::Raw::ExifEntry, 'get entry';
