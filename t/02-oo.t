@@ -32,7 +32,7 @@ is-deeply %info, {:datacount(4), :ordercode(1), :orderstr("Intel"), :tagcount(54
 
 subtest {
   is $e2.lookup(EXIF_TAG_MAKE), 'FUJIFILM', 'tag lookup';
-  $e2.tags(0);
+  is-deeply $e2.tags(0), {"0x010f" => "FUJIFILM", "0x0110" => "FinePix F200EXR", "0x0112" => "Top-left", "0x011a" => "72", "0x011b" => "72", "0x0128" => "Inch", "0x0131" => "GIMP 2.8.20", "0x0132" => "2017:05:14 17:19:31", "0x0213" => "Co-sited", "0x8298" => "[None] (Photographer) - [None] (Editor)", "0xc4a5" => "28 bytes undefined data"}, 'tags in ifd0';
 }, 'tags';
 
 done-testing;

@@ -8,9 +8,9 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my ExifData $exif = exif_data_new();
   $exif = exif_data_new_from_file($file);
-  my Pointer[void] $dummy .= new;
+  my Pointer $dummy .= new;
   exif_data_foreach_content($exif,
-    sub (ExifContent $content, Pointer[void] $dummy) {
+    sub (ExifContent $content, Pointer $dummy) {
       -> ExifContent $content {
         exif_content_dump($content, 0);
       }($content);

@@ -7,7 +7,7 @@ use NativeCall;
 
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
-  sub callback (ExifEntry $entry, Pointer[void] $dummy) {
+  sub callback (ExifEntry $entry, Pointer $dummy) {
     -> ExifEntry $entry, Str $data {
       my Buf $buf .= allocate: 100, 0;
       say "$data: ",
@@ -19,7 +19,7 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
 
   my ExifData $exif = exif_data_new();
   $exif = exif_data_new_from_file($file);
-  my Pointer[void] $dummy .= new;
+  my Pointer $dummy .= new;
   for ^5 {
     my ExifContent $content = $exif."ifd$_"();
     exif_content_foreach_entry($content, &callback, $dummy);

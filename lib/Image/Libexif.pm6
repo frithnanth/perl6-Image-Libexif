@@ -72,12 +72,12 @@ multi method tags(Int $group where 0 <= * < 5)
   my %tags;
   my Buf $buf .= allocate: 100, 0;
 
-  sub callback (ExifEntry $entry, Pointer[void] $dummy) {
+  sub callback (ExifEntry $entry, Pointer $dummy) {
     my $val = exif_entry_get_value($entry, $buf, 100);
     %tags{$entry.tag.fmt('0x%04x')} = $val.trim;
     }
 
-  my Pointer[void] $dummy .= new;
+  my Pointer $dummy .= new;
   my ExifContent $content = $!exif."ifd$group"();
   exif_content_foreach_entry($content, &callback, $dummy);
   %tags;

@@ -18,14 +18,14 @@ class ExifEntry is repr('CStruct') is export {
   has uint64 $.components;
   has Pointer[uint8] $.data;
   has uint32 $.size;
-  has Pointer[void] $.parent; # ExifContent
+  has Pointer $.parent; # ExifContent
   has ExifDataPrivate $.priv;
 }
 
 class ExifContent is repr('CStruct') is export {
   has ExifEntry $.entries is rw;
   has uint32 $.count;
-  has Pointer[void] $.parent; # ExifData
+  has Pointer $.parent; # ExifData
   has ExifDataPrivate $.priv;
 }
 
@@ -53,7 +53,7 @@ sub exif_data_get_byte_order(ExifData $exif --> uint32) is native(LIB) is export
 sub exif_data_set_byte_order(ExifData $exif, uint32 $order) is native(LIB) is export { * }
 sub exif_data_get_mnote_data(ExifData $exif --> ExifMnoteData) is native(LIB) is export { * }
 sub exif_data_fix(ExifData $exif) is native(LIB) is export { * }
-sub exif_data_foreach_content(ExifData $exif, &func (ExifContent $content, Pointer[void] $dummy1), Pointer[void] $dummy2) is native(LIB) is export { * }
+sub exif_data_foreach_content(ExifData $exif, &func (ExifContent $content, Pointer $dummy1), Pointer $dummy2) is native(LIB) is export { * }
 sub exif_data_option_get_name(int32 $o --> Str) is native(LIB) is export { * }
 sub exif_data_option_get_description(int32 $o --> Str) is native(LIB) is export { * }
 sub exif_data_set_option(ExifData $exif, int32 $o) is native(LIB) is export { * }
@@ -87,7 +87,7 @@ sub exif_format_get_size(int32 $format --> uint8) is native(LIB) is export { * }
 
 sub exif_content_get_ifd(ExifContent $exifcontent --> uint32) is native(LIB) is export { * }
 sub exif_content_dump(ExifContent $exifcontent, uint32 $indent) is native(LIB) is export { * }
-sub exif_content_foreach_entry(ExifContent $exifcontent, &func (ExifEntry $entry, Pointer[void] $dummy1), Pointer[void] $dummy2) is native(LIB) is export { * }
+sub exif_content_foreach_entry(ExifContent $exifcontent, &func (ExifEntry $entry, Pointer $dummy1), Pointer $dummy2) is native(LIB) is export { * }
 
 sub exif_byte_order_get_name(uint32 $order --> Str) is native(LIB) is export { * }
 
@@ -185,9 +185,9 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my ExifData $exif = exif_data_new();
   $exif = exif_data_new_from_file($file);
-  my Pointer[void] $dummy .= new;
+  my Pointer $dummy .= new;
   exif_data_foreach_content($exif,
-    sub (ExifContent $content, Pointer[void] $dummy) {
+    sub (ExifContent $content, Pointer $dummy) {
       -> ExifContent $content {
         exif_content_dump($content, 0);
       }($content);

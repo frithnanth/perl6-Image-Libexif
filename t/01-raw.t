@@ -71,13 +71,13 @@ subtest {
   isa-ok $content1, Image::Libexif::Raw::ExifContent, 'new content';
 
   my @collected;
-  sub callback(ExifEntry $entry, Pointer[void] $dummy) {
+  sub callback(ExifEntry $entry, Pointer $dummy) {
     -> ExifEntry $entry, Str $data {
       my Buf $buf .= allocate: 100, 0;
       @collected.push: "$data: " ~ exif_entry_get_value($entry, $buf, 100);
     }($entry, $file);
   }
-  my Pointer[void] $dummy .= new;
+  my Pointer $dummy .= new;
   my ExifContent $content = $exif.ifd0;
   exif_content_foreach_entry($content, &callback, $dummy);
   is @collected.head, 't/sample01.jpg: FUJIFILM', 'exif_content_foreach_entry';
