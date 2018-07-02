@@ -31,7 +31,7 @@ submethod BUILD(Str :$file?, Buf :$data?)
   }
 }
 
-method info
+method info(--> Hash)
 {
   my %info;
   %info<ordercode> = exif_data_get_byte_order $!exif;
@@ -60,32 +60,72 @@ method lookup(uint32 $tag --> Str)
   exif_entry_get_value($entry, $buf, 9);
 }
 
-multi method tags(Int $group where 0 <= * < 5)
+constant IMAGE_INFO            is export = 0;
+constant CAMERA_INFO           is export = 1;
+constant SHOOT_INFO            is export = 2;
+constant GPS_INFO              is export = 3;
+constant INTEROPERABILITY_INFO is export = 4;
+
+method tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
 {
-  # raw-allinfo2.p6
-  # raw-taginfo.p6 for tag descriptions
-  # 0 - image_info
-  # 1 - camera_info
-  # 2 - other_info
-  # 3 - point_shoot_info (GPS)
-  # 4 - unknown_info
   my %tags;
   my Buf $buf .= allocate: 100, 0;
 
-  sub callback (ExifEntry $entry, Pointer $dummy) {
-    my $val = exif_entry_get_value($entry, $buf, 100);
-    %tags{$entry.tag.fmt('0x%04x')} = $val.trim;
+  sub entrycallback (ExifEntry $entry, Pointer $dummy) {
+    my $val = exif_entry_get_value($entry, $buf, 100).trim;
+    if $tagdesc {
+      my ($desc, $prev);
+      for ExifIfd.enums.values.sort -> $id {
+        my $out = exif_tag_get_description_in_ifd($entry.tag, $id);
+        if $out.defined {
+          if $prev.defined && $out eq $prev {
+            last;
+          } else {
+            %tags{$entry.tag.fmt('0x%04x')} = [$val, $out];
+            $prev = $out;
+          }
+        }
+      }
+    } else {
+      %tags{$entry.tag.fmt('0x%04x')} = $val;
     }
+  }
 
   my Pointer $dummy .= new;
   my ExifContent $content = $!exif."ifd$group"();
-  exif_content_foreach_entry($content, &callback, $dummy);
+  exif_content_foreach_entry($content, &entrycallback, $dummy);
   %tags;
+}
+
+method notes(--> Array)
+{
+  my @mnotes;
+  my $mnote = exif_data_get_mnote_data($!exif);
+  my $notes = exif_mnote_data_count($mnote);
+  my $val = Buf.new(1..1024);
+  for 1..$notes -> $note {
+    @mnotes.push:
+      (exif_mnote_data_get_description($mnote, $note) // ' ') ~ ' ' ~
+      (exif_mnote_data_get_name($mnote, $note) // ' ') ~ ' ' ~
+      (exif_mnote_data_get_title($mnote, $note) // ' ') ~ ' ' ~
+      (exif_mnote_data_get_value($mnote, $note, $val, 1024) // '');
+  }
+  @mnotes;
+}
+
+method alltags(:$tagdesc?)
+{
+  my @tags;
+  for ^5 {
+    @tags[$_] = self.tags($_, :$tagdesc);
+  }
+  @tags;
 }
 
 method thumbnail
 {
   # raw-thumbnail.p6
+  ...
 }
 
 =begin pod
