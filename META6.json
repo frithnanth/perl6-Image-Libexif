@@ -4,6 +4,7 @@
   "name" : "Image::Libexif",
   "version" : "0.0.1",
   "description" : "Manipulate image EXIF data",
+  "depends" : [ "NativeHelpers::Blob" ],
   "test-depends" : [ "Test" ],
   "provides" : {
     "Image::Libexif::Constants" : "lib/Image/Libexif/Constants.pm6",
