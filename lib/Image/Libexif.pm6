@@ -38,7 +38,6 @@ method info(--> Hash)
   %info<orderstr> = exif_byte_order_get_name %info<ordercode>;
   %info<datacount> = exif_data_get_data_type $!exif;
   %info<tagcount> = $!exif.ifd0.count + $!exif.ifd1.count + $!exif.ifd2.count + $!exif.ifd3.count + $!exif.ifd4.count;
-  # TODO are there more info to share?
   %info;
 }
 
@@ -56,8 +55,8 @@ method lookup(uint32 $tag --> Str)
   exif_content_get_entry($!exif.ifd2, $tag) ||
   exif_content_get_entry($!exif.ifd3, $tag) ||
   exif_content_get_entry($!exif.ifd4, $tag);
-  my Buf $buf .= allocate: $entry.components, 0;
-  exif_entry_get_value($entry, $buf, 9);
+  my Buf $buf .= allocate: $entry.size, 0;
+  exif_entry_get_value($entry, $buf, $entry.size);
 }
 
 constant IMAGE_INFO            is export = 0;
