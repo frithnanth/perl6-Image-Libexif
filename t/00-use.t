@@ -3,7 +3,8 @@
 use Test;
 use lib 'lib';
 
-plan 2;
+plan 3;
 
 use-ok 'Image::Libexif::Raw';
 use-ok 'Image::Libexif::Constants';
+use-ok 'Image::Libexif';
