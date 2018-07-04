@@ -6,7 +6,7 @@ use Image::Libexif::Constants;
 use NativeHelpers::Blob;
 
 # Perl6 rendition of this C program:
-# http://libexif.cvs.sourceforge.net/viewvc/libexif/libexif/contrib/examples/thumbnail.c?view=markup
+# https://github.com/libexif/libexif/blob/master/contrib/examples/thumbnail.c
 
 #| This program extracts an EXIF thumbnail from an image and saves it into a new file (in the same directory as the original).
 sub MAIN($file! where { .IO.f // die "file '$file' not found" })
