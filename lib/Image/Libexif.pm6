@@ -48,22 +48,29 @@ method close
   }
 }
 
-method lookup(uint32 $tag --> Str)
+constant IMAGE_INFO            is export = 0;
+constant CAMERA_INFO           is export = 1;
+constant SHOOT_INFO            is export = 2;
+constant GPS_INFO              is export = 3;
+constant INTEROPERABILITY_INFO is export = 4;
+
+multi method lookup(Int $tag!, Int $group! --> Str)
+{
+  my ExifEntry $entry = exif_content_get_entry($!exif."ifd$group"(), $tag);
+  my Buf $buf .= allocate: 1024, 0;
+  exif_entry_get_value($entry, $buf, 1024);
+}
+
+multi method lookup(Int $tag! --> Str)
 {
   my ExifEntry $entry = exif_content_get_entry($!exif.ifd0, $tag) ||
   exif_content_get_entry($!exif.ifd1, $tag) ||
   exif_content_get_entry($!exif.ifd2, $tag) ||
   exif_content_get_entry($!exif.ifd3, $tag) ||
   exif_content_get_entry($!exif.ifd4, $tag);
-  my Buf $buf .= allocate: $entry.size, 0;
-  exif_entry_get_value($entry, $buf, $entry.size);
+  my Buf $buf .= allocate: 1024, 0;
+  exif_entry_get_value($entry, $buf, 1024);
 }
-
-constant IMAGE_INFO            is export = 0;
-constant CAMERA_INFO           is export = 1;
-constant SHOOT_INFO            is export = 2;
-constant GPS_INFO              is export = 3;
-constant INTEROPERABILITY_INFO is export = 4;
 
 method tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
 {
@@ -115,9 +122,7 @@ method notes(--> Array)
 method alltags(:$tagdesc?)
 {
   my @tags;
-  for ^5 {
-    @tags[$_] = self.tags($_, :$tagdesc);
-  }
+  @tags[$_] = self.tags($_, :$tagdesc) for ^5;
   @tags;
 }
 
