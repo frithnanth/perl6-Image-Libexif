@@ -3,6 +3,7 @@
   "tags" : [ "image", "exif", "nativecall" ],
   "name" : "Image::Libexif",
   "version" : "0.0.1",
+  "api" : "1",
   "description" : "Manipulate image EXIF data",
   "depends" : [ "NativeHelpers::Blob" ],
   "test-depends" : [ "Test" ],
@@ -13,5 +14,5 @@
   },
   "authors" : [ "Fernando Santagata" ],
   "license": "Artistic-2.0",
-  "source-url" : "git://github.com/frithnanth/perl6-Image-Libexif"
+  "source-url" : "git://github.com/frithnanth/perl6-Image-Libexif.git"
 }
