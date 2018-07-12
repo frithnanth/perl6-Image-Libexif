@@ -200,12 +200,11 @@ use v6;
 
 use Image::Libexif::Constants;
 
-
 =end code
 
 =head1 DESCRIPTION
 
-For more details on libexif see L<https://github.com/libexif>.
+For more details on libexif see L<https://github.com/libexif> and L<https://libexif.github.io/docs.html>.
 
 =head1 Prerequisites
 
