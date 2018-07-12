@@ -1,7 +1,6 @@
 #!/usr/bin/env perl6
 
 use Concurrent::File::Find;
-use lib 'lib';
 use Image::Libexif;
 use Image::Libexif::Constants;
 
