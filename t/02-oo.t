@@ -10,6 +10,11 @@ my Image::Libexif $e2;
 subtest {
   my Image::Libexif $e1 .= new;
   isa-ok $e1, Image::Libexif, 'simple initialization';
+  lives-ok { $e1.open: 't/sample01.jpg' }, 'open existent file';
+  throws-like { $e1.open: 'nonexistent' },
+             X::Libexif,
+             message => /'File nonexistent not found'/,
+             'throws if file not found';
   $e2 .= new: :file('t/sample01.jpg');
   isa-ok $e2, Image::Libexif, 'initialization from file';
   throws-like
@@ -28,7 +33,7 @@ subtest {
 }, 'initialization';
 
 my %info = $e2.info;
-is-deeply %info, {:datacount(4), :ordercode(1), :orderstr("Intel"), :tagcount(54)}, 'info';
+is-deeply %info, {:datatype(4), :ordercode(1), :orderstr("Intel"), :tagcount(54)}, 'info';
 
 subtest {
   is $e2.lookup(EXIF_TAG_MAKE), 'FUJIFILM', 'tag lookup constant';
