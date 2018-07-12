@@ -31,12 +31,18 @@ submethod BUILD(Str :$file?, Buf :$data?)
   }
 }
 
+method open(Str $file!)
+{
+  fail X::Libexif.new: errno => 1, error => "File $file not found" if ! $file.IO.e;
+  $!exif = exif_data_new_from_file $file;
+}
+
 method info(--> Hash)
 {
   my %info;
   %info<ordercode> = exif_data_get_byte_order $!exif;
   %info<orderstr> = exif_byte_order_get_name %info<ordercode>;
-  %info<datacount> = exif_data_get_data_type $!exif;
+  %info<datatype> = exif_data_get_data_type $!exif;
   %info<tagcount> = $!exif.ifd0.count + $!exif.ifd1.count + $!exif.ifd2.count + $!exif.ifd3.count + $!exif.ifd4.count;
   %info;
 }
@@ -136,10 +142,11 @@ method thumbnail
 
 =head1 NAME
 
-Image::Libexif - An OO interface to libexif
+Image::Libexif - High-level bindings to libexif
 
 =head1 SYNOPSIS
 =begin code
+
 use v6;
 
 use Image::Libexif;
@@ -147,12 +154,83 @@ use Image::Libexif;
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my Image::Libexif $e .= new: :$file;
+  my @tags := $e.alltags: :tagdesc;
+  say @tags».keys.flat.elems ~ ' tags found';
+  my constant @groupdesc = 'Image info', 'Camera info', 'Shoot info', 'GPS info', 'Interoperability info';
+  for ^EXIF_IFD_COUNT -> $group {
+    say "Group $group: @groupdesc[$group]";
+    for %(@tags[$group]).kv -> $k, @v {
+      say "$k: @v[1] => @v[0]";
+    }
+  }
 }
+
+=end code
+
+=begin code
+
+use v6;
+
+use Concurrent::File::Find;
+use Image::Libexif;
+use Image::Libexif::Constants;
+
+#| This program displays the EXIF date and time for every file in a directory tree
+sub MAIN($dir where {.IO.d // die "$dir not found"})
+{
+  my @files := find $dir, :extension('jpg'), :exclude-dir('thumbnails') :file, :!directory;
+  @files.race.map: -> $file {
+      my Image::Libexif $e .= new: :file($file);
+      try say "$file " ~ $e.lookup(EXIF_TAG_DATE_TIME_ORIGINAL); # don't die if no EXIF is present
+      $e.close;
+    }
+}
+
 =end code
 
 =head1 DESCRIPTION
 
-For more details on libexif see L<https://github.com/libexif>.
+Image::Libexif provides an OO interface to libexif.
+
+=head2 new(Str :$file?)
+
+Creates an Image::Libexif object.
+
+If the optional argument B<$file> is provided, then it will be opened and read; if not provided
+during the initialization, the program must call the B<open> method later.
+
+=head2 open(Str $file!)
+
+Opens a file.
+
+=head2 close
+
+Closes the internal libexif object, frees the memory and cleans up.
+
+=head2 info(--> Hash)
+
+Gathers some info:
+
+=item ordercode - the byte order as a code
+=item orderstr  - the byte order as a string
+=item datatype  - the data type
+=item tagcount  - the number of tags
+
+=head2 lookup(Int $tag!, Int $group! --> Str)
+=head2 lookup(Int $tag! --> Str)
+
+Looks up a tag in a specific group or in all groups.
+Group names are available as constants:
+
+=item IMAGE_INFO
+=item CAMERA_INFO
+=item SHOOT_INFO
+=item GPS_INFO
+=item INTEROPERABILITY_INFO
+
+=head2 tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
+
+
 
 =head1 Prerequisites
 
