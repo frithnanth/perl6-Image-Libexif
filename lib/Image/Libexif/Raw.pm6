@@ -181,6 +181,7 @@ use v6;
 use Image::Libexif::Raw;
 use NativeCall;
 
+#| This program dumps the EXIF content of its argument
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my ExifData $exif = exif_data_new();
@@ -199,7 +200,7 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
 
 =head1 DESCRIPTION
 
-For more details on libexif see L<https://github.com/libexif>.
+For more details on libexif see L<https://github.com/libexif> and L<https://libexif.github.io/docs.html>.
 
 =head1 Prerequisites
 
