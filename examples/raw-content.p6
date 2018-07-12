@@ -4,6 +4,7 @@ use lib 'lib';
 use Image::Libexif::Raw;
 use NativeCall;
 
+#| This program dumps the EXIF content of its argument
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my ExifData $exif = exif_data_new();
