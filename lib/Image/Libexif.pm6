@@ -138,7 +138,7 @@ our %tagnames is export(:tagnames) =
 submethod BUILD(Str :$file?, Buf :$data?)
 {
   with $file {
-    if $file.IO.e {
+    if $file.IO.f {
       $!exif = exif_data_new_from_file $file;
     } else {
       fail X::Libexif.new: errno => 1, error => "File $file not found";
@@ -249,17 +249,26 @@ method notes(--> Array)
   @mnotes;
 }
 
-method alltags(:$tagdesc? --> Array)
+method alltags(Bool :$tagdesc? --> Array)
 {
   my @tags;
   @tags[$_] = self.tags($_, :$tagdesc) for ^5;
   @tags;
 }
 
-method thumbnail
+method thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
 {
-  # raw-thumbnail.p6
-  ...
+  my $l = exif_loader_new() // fail X::Libexif.new: errno => 2, error => ’Can't create an exif loader‘;
+  exif_loader_write_file($l, $file);
+  my $ed = exif_loader_get_data($l) // fail X::Libexif.new: errno => 3, error => ’Can't get the exif data‘;
+  exif_loader_unref($l);
+  if $ed.data && $ed.size {
+    my $data = blob-from-pointer($ed.data, :elems($ed.size), :type(Blob));
+    return $data;
+  } else {
+    fail X::Libexif.new: errno => 4, error => "No EXIF thumbnail in file $file";
+  }
+  exif_data_unref($ed);
 }
 
 =begin pod
