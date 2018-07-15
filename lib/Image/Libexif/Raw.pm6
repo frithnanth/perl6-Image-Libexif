@@ -42,7 +42,7 @@ class ExifData is repr('CStruct') is export {
 
 sub exif_data_new(--> ExifData) is native(LIB) is export { * }
 sub exif_data_new_from_file(Str $path --> ExifData) is native(LIB) is export { * }
-sub exif_data_new_from_data(Pointer[uint8] $data, uint32 $size --> ExifData) is native(LIB) is export { * }
+sub exif_data_new_from_data(Pointer $data, uint32 $size --> ExifData) is native(LIB) is export { * }
 sub exif_data_load_data(ExifData $exif, Pointer $d, uint32 $size) is native(LIB) is export { * }
 sub exif_data_save_data(ExifData $exif, Pointer $d is rw, uint8 $ds is rw) is native(LIB) is export { * }
 sub exif_data_dump(ExifData $data) is native(LIB) is export { * }
@@ -122,17 +122,17 @@ sub exif_loader_write_file(ExifLoader $l, Str $fname) is native(LIB) is export {
 sub exif_loader_write(ExifLoader $l, Buf $buf, uint32 $size) is native(LIB) is export { * }
 sub exif_loader_reset(ExifLoader $l) is native(LIB) is export { * }
 sub exif_loader_get_data(ExifLoader $l --> ExifData) is native(LIB) is export { * }
-sub exif_loader_get_buf(ExifLoader $l, Pointer[uint8] $d is rw, uint32 $ds is rw) is native(LIB) is export { * }
+sub exif_loader_get_buf(ExifLoader $l, Pointer $d is rw, uint32 $ds is rw) is native(LIB) is export { * }
 sub exif_loader_log(ExifLoader $l, ExifLog $log) is native(LIB) is export { * }
 
-sub exif_set_short(Pointer[uint8] $data, uint16 $order, uint8 $value) is native(LIB) is export { * }
-sub exif_set_sshort(Pointer[uint8] $data, int16 $order, uint8 $value) is native(LIB) is export { * }
-sub exif_set_long(Pointer[uint8] $data, uint32 $order, uint8 $value) is native(LIB) is export { * }
-sub exif_set_slong(Pointer[uint8] $data, int32 $order, uint8 $value) is native(LIB) is export { * }
-sub exif_get_short(Pointer[uint8] $data, uint8 $value --> uint16) is native(LIB) is export { * }
-sub exif_get_sshort(Pointer[uint8] $data, uint8 $value --> int16) is native(LIB) is export { * }
-sub exif_get_long(Pointer[uint8] $data, uint8 $value --> uint32) is native(LIB) is export { * }
-sub exif_get_slong(Pointer[uint8] $data, uint8 $value --> int32) is native(LIB) is export { * }
+sub exif_set_short(Pointer $data, uint16 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_sshort(Pointer $data, int16 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_long(Pointer $data, uint32 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_set_slong(Pointer $data, int32 $order, uint8 $value) is native(LIB) is export { * }
+sub exif_get_short(Pointer $data, uint8 $value --> uint16) is native(LIB) is export { * }
+sub exif_get_sshort(Pointer $data, uint8 $value --> int16) is native(LIB) is export { * }
+sub exif_get_long(Pointer $data, uint8 $value --> uint32) is native(LIB) is export { * }
+sub exif_get_slong(Pointer $data, uint8 $value --> int32) is native(LIB) is export { * }
 
 =begin pod
 
