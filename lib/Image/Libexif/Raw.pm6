@@ -1,6 +1,6 @@
 use v6;
 
-unit module Image::Libexif::Raw:ver<0.0.1>;
+unit module Image::Libexif::Raw:ver<0.0.2>;
 
 use NativeCall;
 use Image::Libexif::Constants;

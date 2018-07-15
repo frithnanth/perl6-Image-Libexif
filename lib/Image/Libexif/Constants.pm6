@@ -1,5 +1,5 @@
 use v6;
-unit module Image::Libexif::Constants:ver<0.0.1>;
+unit module Image::Libexif::Constants:ver<0.0.2>;
 
 enum ExifDataType is export (:EXIF_DATA_TYPE_UNCOMPRESSED_CHUNKY(0), :EXIF_DATA_TYPE_UNCOMPRESSED_PLANAR(1),
     :EXIF_DATA_TYPE_UNCOMPRESSED_YCC(2), :EXIF_DATA_TYPE_COMPRESSED(3), :EXIF_DATA_TYPE_COUNT(4),
