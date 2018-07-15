@@ -4,6 +4,7 @@ use Test;
 use lib 'lib';
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
+use NativeHelpers::Blob;
 use NativeCall;
 
 constant AUTHOR = ?%*ENV<TEST_AUTHOR>;
@@ -14,20 +15,21 @@ my ExifData ($exif, $exif1);
 subtest {
   $exif = exif_data_new();
   isa-ok $exif, Image::Libexif::Raw::ExifData, 'simple initialization';
+  exif_data_free($exif);
   $exif = exif_data_new_from_file($file);
   isa-ok $exif, Image::Libexif::Raw::ExifData, 'initialization from file';
-  my uint8 $ds;
-  my Pointer $d;
-  exif_data_save_data($exif, $d, $ds);
-  $exif1 = exif_data_new_from_data($d, $ds);
+  my $jpeg = slurp $file, :bin;
+  $exif1 = exif_data_new_from_data(pointer-to($jpeg), $jpeg.bytes);
   isa-ok $exif1, Image::Libexif::Raw::ExifData, 'initialization from memory data';
 }, 'initialization';
 
 subtest {
   is exif_byte_order_get_name(EXIF_BYTE_ORDER_MOTOROLA), 'Motorola', 'get byte order name';
-  cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_MOTOROLA, 'get exif data byte order';
-  exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_INTEL);
-  cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_INTEL, 'set exif data byte order';
+  if AUTHOR {
+    cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_INTEL, 'get exif data byte order';
+  }
+  exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_MOTOROLA);
+  cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_MOTOROLA, 'set exif data byte order';
   is exif_ifd_get_name(EXIF_IFD_INTEROPERABILITY), 'Interoperability', 'get ifd name';
   is exif_content_get_ifd($exif1.ifd0), 0, 'read ifd';
   exif_data_free($exif1);
