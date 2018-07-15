@@ -26,6 +26,10 @@ subtest {
   my Image::Libexif $e3 .= new: :data($buffer);
   isa-ok $e3, Image::Libexif, 'initialization from raw data';
   lives-ok { $e3.close }, 'close and free';
+  my Image::Libexif $e4 .= new;
+  $e4.load: $buffer;
+  isa-ok $e4, Image::Libexif, 'load buffer data';
+  cmp-ok $e4.alltags».keys.flat.elems, '==', 54, 'loaded tags';
   lives-ok {my @promises;
             for ^5 {@promises.push: start {my $ee = Image::Libexif.new: :file('t/sample01.jpg'); sleep .1; $ee.close}}
             await @promises},
@@ -47,7 +51,7 @@ subtest {
   is %tags<0xc4a5>[1], ‘Related to Epson's PRINT Image Matching technology’, 'tag description';
   my @alltags = $e2.alltags(:tagdesc);
   my $numkeys = @alltags».keys.flat.elems;
-  cmp-ok $numkeys, '=', 54, 'alltags elems';
+  cmp-ok $numkeys, '==', 54, 'alltags elems';
   is @alltags[IMAGE_INFO]<0xc4a5>[1], ‘Related to Epson's PRINT Image Matching technology’, 'alltags description';
   my @nalltags = $e2.alltags;
   ok all(
