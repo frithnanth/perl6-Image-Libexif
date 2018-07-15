@@ -4,6 +4,7 @@ use lib 'lib';
 use Image::Libexif :tagnames;
 use Image::Libexif::Constants;
 
+#| Prints all the EXIF tags
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my Image::Libexif $e .= new: :$file;
