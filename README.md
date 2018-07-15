@@ -10,6 +10,48 @@ Image::Libexif - An interface to libexif.
 
 ## Example
 
+High-level interface:
+
+```Perl6
+use v6;
+
+use Image::Libexif :tagnames;
+use Image::Libexif::Constants;
+
+#| Prints all the EXIF tags
+sub MAIN($file! where { .IO.f // die "file $file not found" })
+{
+  my Image::Libexif $e .= new: :$file;
+  my @tags := $e.alltags: :tagdesc;
+  say @tags».keys.flat.elems ~ ' tags found';
+  for ^EXIF_IFD_COUNT -> $group {
+    say "Group $group: " ~ «'Image info' 'Camera info' 'Shoot info' 'GPS info' 'Interoperability info'»[$group];
+    for %(@tags[$group]).kv -> $k, @v {
+      say "%tagnames{$k.Int}: @v[1] => @v[0]";
+    }
+  }
+}
+```
+
+```Perl6
+use v6;
+
+use Concurrent::File::Find;
+use Image::Libexif;
+use Image::Libexif::Constants;
+
+#| This program displays the EXIF date and time for every file in a directory tree
+sub MAIN($dir where {.IO.d // die "$dir not found"})
+{
+  my @files := find $dir, :extension('jpg'), :exclude-dir('thumbnails') :file, :!directory;
+  @files.race.map: -> $file {
+      my Image::Libexif $e .= new: :file($file);
+      try say "$file " ~ $e.lookup(EXIF_TAG_DATE_TIME_ORIGINAL); # don't die if no EXIF is present
+      $e.close;
+    }
+}
+```
+
 Raw interface:
 
 ```Perl6
@@ -49,9 +91,77 @@ For more examples see the `example` directory.
 
 Image::Libexif provides an interface to libexif and allows you to access the EXIF records of an image.
 
+For more details on libexif see L<https://github.com/libexif> and L<https://libexif.github.io/docs.html>.
+
 ## Documentation
 
+#### use Image::Libexif;
+#### use Image::Libexif :tagnames;
+
+If asked to import the additional symbol `tagnames`, Image::Libexif will make available the Hash %tagnames, which
+has tag numbers as keys and a short description as values.
+
 #### new()
+Creates an Image::Libexif object.
+
+If the optional argument `$file` is provided, then it will be opened and read; if not provided
+during the initialization, the program may call the `open` method later.
+If the optional argument `data` is provided, then the object will be initialized from the provided data; if not
+provided during the initialization, the program may call the `load` method later.
+
+#### open(Str $file!)
+Opens a file and reads it into an initialiazed object (when no file or data has been provided during initialization).
+
+#### load(Buf $data!)
+
+Reads the data into an initialiazed object (when no file or data has been provided during initialization).
+
+#### close
+
+Closes the internal libexif object, frees the memory and cleans up.
+
+#### info(--> Hash)
+
+Gathers some info:
+
+* `ordercode`: the byte order as a code
+* `orderstr`:  the byte order as a string
+* `datatype`:  the data type
+* `tagcount`:  the number of tags
+
+#### lookup(Int $tag!, Int $group! --> Str)
+#### lookup(Int $tag! --> Str)
+
+Looks up a tag in a specific group or in all groups. A tag may be present in more than one group.
+Group names are available as constants:
+
+* `IMAGE_INFO`
+* `CAMERA_INFO`
+* `SHOOT_INFO`
+* `GPS_INFO`
+* `INTEROPERABILITY_INFO`
+
+#### tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
+
+Delivers all the tags in a specific group into a hash; the keys are the tag numbers.
+If the tag description is requested, the hash values are presented as an array [value, tag description].
+
+#### alltags(:$tagdesc? --> Array)
+
+Delivers an array of hashes, one for each group.
+If the tag description is requested, the hash values are presented as an array [value, tag description].
+
+#### notes(--> Array)
+
+Reads the Maker Note data as an array of strings.
+Each string is a concatenation of the note description, name, title, and value.
+
+#### Errors
+
+There one case when an error may be returned: trying to open a non-existent file.
+This can happen while initializing an object with .new() and calling the .open() method.
+In both cases the method will return a Failure object, which can
+be trapped and the exception can be analyzed and acted upon.
 
 ## Prerequisites
 This module requires the libexif library to be installed. Please follow the instructions below based on your platform:
@@ -83,7 +193,7 @@ $ prove -e "perl6 -Ilib"
 
 ## Note
 
-Archive::Libexif relies on a C library which might not be present in one's
+Image::Libexif relies on a C library which might not be present in one's
 installation, so it's not a substitute for a pure Perl6 module.
 
 ## Author
