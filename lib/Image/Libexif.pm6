@@ -16,6 +16,125 @@ class X::Libexif is Exception
 
 has ExifData $!exif;
 
+our %tagnames is export(:tagnames) =
+  0x0001 => 'Interoperability index',
+  0x0002 => 'Interoperability version',
+  0x00fe => 'New subfile type',
+  0x0100 => 'Image width',
+  0x0101 => 'Image length',
+  0x0102 => 'Bits per sample',
+  0x0103 => 'Compression',
+  0x0106 => 'Photometric interpretation',
+  0x010a => 'Fill order',
+  0x010d => 'Document name',
+  0x010e => 'Image description',
+  0x010f => 'Make',
+  0x0110 => 'Model',
+  0x0111 => 'Strip offsets',
+  0x0112 => 'Orientation',
+  0x0115 => 'Samples per pixel',
+  0x0116 => 'Rows per strip',
+  0x0117 => 'Strip byte counts',
+  0x011a => 'X resolution',
+  0x011b => 'Y resolution',
+  0x011c => 'Planar configuration',
+  0x0128 => 'Resolution unit',
+  0x012d => 'Transfer function',
+  0x0131 => 'Software',
+  0x0132 => 'Date time',
+  0x013b => 'Artist',
+  0x013e => 'White point',
+  0x013f => 'Primary chromaticities',
+  0x014a => 'Sub ifds',
+  0x0156 => 'Transfer range',
+  0x0200 => 'Jpeg proc',
+  0x0201 => 'Jpeg interchange format',
+  0x0202 => 'Jpeg interchange format length',
+  0x0211 => 'Ycbcr coefficients',
+  0x0212 => 'Ycbcr sub sampling',
+  0x0213 => 'Ycbcr positioning',
+  0x0214 => 'Reference black white',
+  0x02bc => 'Xml packet',
+  0x1000 => 'Related image file format',
+  0x1001 => 'Related image width',
+  0x1002 => 'Related image length',
+  0x828d => 'Cfa repeat pattern dim',
+  0x828e => 'Cfa pattern',
+  0x828f => 'Battery level',
+  0x8298 => 'Copyright',
+  0x829a => 'Exposure time',
+  0x829d => 'Fnumber',
+  0x83bb => 'Iptc naa',
+  0x8649 => 'Image resources',
+  0x8769 => 'Exif ifd pointer',
+  0x8773 => 'Inter color profile',
+  0x8822 => 'Exposure program',
+  0x8824 => 'Spectral sensitivity',
+  0x8825 => 'Gps info ifd pointer',
+  0x8827 => 'Iso speed ratings',
+  0x8828 => 'Oecf',
+  0x882a => 'Time zone offset',
+  0x9000 => 'Exif version',
+  0x9003 => 'Date time original',
+  0x9004 => 'Date time digitized',
+  0x9101 => 'Components configuration',
+  0x9102 => 'Compressed bits per pixel',
+  0x9201 => 'Shutter speed value',
+  0x9202 => 'Aperture value',
+  0x9203 => 'Brightness value',
+  0x9204 => 'Exposure bias value',
+  0x9205 => 'Max aperture value',
+  0x9206 => 'Subject distance',
+  0x9207 => 'Metering mode',
+  0x9208 => 'Light source',
+  0x9209 => 'Flash',
+  0x920a => 'Focal length',
+  0x9214 => 'Subject area',
+  0x9216 => 'Tiff ep standard id',
+  0x927c => 'Maker note',
+  0x9286 => 'User comment',
+  0x9290 => 'Sub sec time',
+  0x9291 => 'Sub sec time original',
+  0x9292 => 'Sub sec time digitized',
+  0x9c9b => 'Xp title',
+  0x9c9c => 'Xp comment',
+  0x9c9d => 'Xp author',
+  0x9c9e => 'Xp keywords',
+  0x9c9f => 'Xp subject',
+  0xa000 => 'Flash pix version',
+  0xa001 => 'Color space',
+  0xa002 => 'Pixel x dimension',
+  0xa003 => 'Pixel y dimension',
+  0xa004 => 'Related sound file',
+  0xa005 => 'Interoperability ifd pointer',
+  0xa20b => 'Flash energy',
+  0xa20c => 'Spatial frequency response',
+  0xa20e => 'Focal plane x resolution',
+  0xa20f => 'Focal plane y resolution',
+  0xa210 => 'Focal plane resolution unit',
+  0xa214 => 'Subject location',
+  0xa215 => 'Exposure index',
+  0xa217 => 'Sensing method',
+  0xa300 => 'File source',
+  0xa301 => 'Scene type',
+  0xa302 => 'New cfa pattern',
+  0xa401 => 'Custom rendered',
+  0xa402 => 'Exposure mode',
+  0xa403 => 'White balance',
+  0xa404 => 'Digital zoom ratio',
+  0xa405 => 'Focal length in 35mm film',
+  0xa406 => 'Scene capture type',
+  0xa407 => 'Gain control',
+  0xa408 => 'Contrast',
+  0xa409 => 'Saturation',
+  0xa40a => 'Sharpness',
+  0xa40b => 'Device setting description',
+  0xa40c => 'Subject distance range',
+  0xa420 => 'Image unique id',
+  0xa500 => 'Gamma',
+  0xc4a5 => 'Print image matching',
+  0xea1c => 'Padding';
+
 submethod BUILD(Str :$file?, Buf :$data?)
 {
   with $file {
@@ -35,6 +154,11 @@ method open(Str $file!)
 {
   fail X::Libexif.new: errno => 1, error => "File $file not found" if ! $file.IO.e;
   $!exif = exif_data_new_from_file $file;
+}
+
+method load(Buf $buffer!)
+{
+  exif_data_load_data $!exif, pointer-to($buffer), $buffer.bytes;
 }
 
 method info(--> Hash)
@@ -125,7 +249,7 @@ method notes(--> Array)
   @mnotes;
 }
 
-method alltags(:$tagdesc?)
+method alltags(:$tagdesc? --> Array)
 {
   my @tags;
   @tags[$_] = self.tags($_, :$tagdesc) for ^5;
@@ -145,22 +269,23 @@ method thumbnail
 Image::Libexif - High-level bindings to libexif
 
 =head1 SYNOPSIS
+
 =begin code
 
 use v6;
 
-use Image::Libexif;
+use Image::Libexif :tagnames;
+use Image::Libexif::Constants;
 
 sub MAIN($file! where { .IO.f // die "file $file not found" })
 {
   my Image::Libexif $e .= new: :$file;
   my @tags := $e.alltags: :tagdesc;
   say @tags».keys.flat.elems ~ ' tags found';
-  my constant @groupdesc = 'Image info', 'Camera info', 'Shoot info', 'GPS info', 'Interoperability info';
   for ^EXIF_IFD_COUNT -> $group {
-    say "Group $group: @groupdesc[$group]";
+    say "Group $group: " ~ «'Image info' 'Camera info' 'Shoot info' 'GPS info' 'Interoperability info'»[$group];
     for %(@tags[$group]).kv -> $k, @v {
-      say "$k: @v[1] => @v[0]";
+      say "%tagnames{$k.Int}: @v[1] => @v[0]";
     }
   }
 }
@@ -192,16 +317,28 @@ sub MAIN($dir where {.IO.d // die "$dir not found"})
 
 Image::Libexif provides an OO interface to libexif.
 
-=head2 new(Str :$file?)
+=head2 use Image::Libexif;
+=head2 use Image::Libexif :tagnames;
+
+If asked to import the additional symbol B<tagnames>, Image::Libexif will make available the Hash %tagnames, which
+has tag numbers as keys and a short description as values.
+
+=head2 new(Str :$file?, Buf :$data?)
 
 Creates an Image::Libexif object.
 
 If the optional argument B<$file> is provided, then it will be opened and read; if not provided
-during the initialization, the program must call the B<open> method later.
+during the initialization, the program may call the B<open> method later.
+If the optional argument B<data> is provided, then the object will be initialized from the provided data; if not
+provided during the initialization, the program may call the B<load> method later.
 
 =head2 open(Str $file!)
 
-Opens a file.
+Opens a file and reads it into an initialiazed object (when no file or data has been provided during initialization).
+
+=head2 load(Buf $data!)
+
+Reads the data into an initialiazed object (when no file or data has been provided during initialization).
 
 =head2 close
 
@@ -219,7 +356,7 @@ Gathers some info:
 =head2 lookup(Int $tag!, Int $group! --> Str)
 =head2 lookup(Int $tag! --> Str)
 
-Looks up a tag in a specific group or in all groups.
+Looks up a tag in a specific group or in all groups. A tag may be present in more than one group.
 Group names are available as constants:
 
 =item IMAGE_INFO
@@ -230,7 +367,25 @@ Group names are available as constants:
 
 =head2 tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
 
+Delivers all the tags in a specific group into a hash; the keys are the tag numbers.
+If the tag description is requested, the hash values are presented as an array [value, tag description].
 
+=head2 alltags(:$tagdesc? --> Array)
+
+Delivers an array of hashes, one for each group.
+If the tag description is requested, the hash values are presented as an array [value, tag description].
+
+=head2 notes(--> Array)
+
+Reads the Maker Note data as an array of strings.
+Each string is a concatenation of the note description, name, title, and value.
+
+=head2 Errors
+
+There one case when an error may be returned: trying to open a non-existent file.
+This can happen while initializing an object with .new() and calling the .open() method.
+In both cases the method will return a Failure object, which can
+be trapped and the exception can be analyzed and acted upon.
 
 =head1 Prerequisites
 
