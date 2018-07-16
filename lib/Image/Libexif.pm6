@@ -256,7 +256,8 @@ method alltags(Bool :$tagdesc? --> Array)
   @tags;
 }
 
-method thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
+sub thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
+  is export(:thumbnail)
 {
   my $l = exif_loader_new() // fail X::Libexif.new: errno => 2, error => ’Can't create an exif loader‘;
   exif_loader_write_file($l, $file);
@@ -388,6 +389,11 @@ If the tag description is requested, the hash values are presented as an array [
 
 Reads the Maker Note data as an array of strings.
 Each string is a concatenation of the note description, name, title, and value.
+
+=head2 sub thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob) is export(:thumbnail)
+
+Returns the thumbnail found in the original file, if any, as a Blob.
+It's a sub, not a method, so it must be imported explicitly: B<use Image::Libexif :thumbnail;>.
 
 =head2 Errors
 
