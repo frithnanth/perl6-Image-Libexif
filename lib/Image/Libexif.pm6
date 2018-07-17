@@ -258,6 +258,11 @@ method alltags(Bool :$tagdesc? --> Array)
   @tags;
 }
 
+method thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
+{
+  thumbnail($file);
+}
+
 sub thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
   is export(:thumbnail)
 {
@@ -392,10 +397,13 @@ If the tag description is requested, the hash values are presented as an array [
 Reads the Maker Note data as an array of strings.
 Each string is a concatenation of the note description, name, title, and value.
 
+=head2 method thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob)
 =head2 sub thumbnail($file where { .IO.f // fail X::Libexif.new: errno => 1, error => "File $_ not found" } --> Blob) is export(:thumbnail)
 
 Returns the thumbnail found in the original file, if any, as a Blob.
-It's a sub, not a method, so it must be imported explicitly: B<use Image::Libexif :thumbnail;>.
+This functionality is available as a method and a sub, since the library doesn't really need a fully initialized
+exif object.
+To use the sub import it explicitly: B<use Image::Libexif :thumbnail;>.
 
 =head2 Errors
 
