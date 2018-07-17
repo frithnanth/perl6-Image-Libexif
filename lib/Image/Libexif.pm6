@@ -154,11 +154,13 @@ method open(Str $file!)
 {
   fail X::Libexif.new: errno => 1, error => "File $file not found" if ! $file.IO.e;
   $!exif = exif_data_new_from_file $file;
+  self;
 }
 
 method load(Buf $buffer!)
 {
   exif_data_load_data $!exif, pointer-to($buffer), $buffer.bytes;
+  self;
 }
 
 method info(--> Hash)
