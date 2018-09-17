@@ -1,11 +1,11 @@
 use v6;
 
-unit module Image::Libexif::Raw:ver<0.0.2>;
+unit module Image::Libexif::Raw:ver<0.0.3>;
 
 use NativeCall;
 use Image::Libexif::Constants;
 
-constant LIB = ('libexif.so', v0.6);
+constant LIB = ('exif', v12);
 
 class ExifDataPrivate is repr('CPointer') { * }
 class ExifMnoteData is repr('CPointer') { * }
