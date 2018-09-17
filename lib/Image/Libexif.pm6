@@ -1,5 +1,5 @@
 use v6;
-unit class Image::Libexif:ver<0.0.2>;
+unit class Image::Libexif:ver<0.0.3>;
 
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
