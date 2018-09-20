@@ -1,5 +1,5 @@
 use v6;
-unit class Image::Libexif:ver<0.0.3>;
+unit class Image::Libexif:ver<0.1.0>;
 
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
@@ -169,7 +169,11 @@ method info(--> Hash)
   %info<ordercode> = exif_data_get_byte_order $!exif;
   %info<orderstr> = exif_byte_order_get_name %info<ordercode>;
   %info<datatype> = exif_data_get_data_type $!exif;
-  %info<tagcount> = $!exif.ifd0.count + $!exif.ifd1.count + $!exif.ifd2.count + $!exif.ifd3.count + $!exif.ifd4.count;
+  %info<tagcount> = $!exif.ifd[EXIF_IFD_0].count +
+                    $!exif.ifd[EXIF_IFD_1].count +
+                    $!exif.ifd[EXIF_IFD_EXIF].count +
+                    $!exif.ifd[EXIF_IFD_GPS].count +
+                    $!exif.ifd[EXIF_IFD_INTEROPERABILITY].count;
   %info;
 }
 
@@ -188,18 +192,18 @@ constant INTEROPERABILITY_INFO is export = 4;
 
 multi method lookup(Int $tag!, Int $group! --> Str)
 {
-  my ExifEntry $entry = exif_content_get_entry($!exif."ifd$group"(), $tag);
+  my ExifEntry $entry = exif_content_get_entry($!exif.ifd[$group], $tag);
   my Buf $buf .= allocate: 1024, 0;
   exif_entry_get_value($entry, $buf, 1024);
 }
 
 multi method lookup(Int $tag! --> Str)
 {
-  my ExifEntry $entry = exif_content_get_entry($!exif.ifd0, $tag) ||
-  exif_content_get_entry($!exif.ifd1, $tag) ||
-  exif_content_get_entry($!exif.ifd2, $tag) ||
-  exif_content_get_entry($!exif.ifd3, $tag) ||
-  exif_content_get_entry($!exif.ifd4, $tag);
+  my ExifEntry $entry = exif_content_get_entry($!exif.ifd[EXIF_IFD_0], $tag) ||
+  exif_content_get_entry($!exif.ifd[EXIF_IFD_1], $tag) ||
+  exif_content_get_entry($!exif.ifd[EXIF_IFD_EXIF], $tag) ||
+  exif_content_get_entry($!exif.ifd[EXIF_IFD_GPS], $tag) ||
+  exif_content_get_entry($!exif.ifd[EXIF_IFD_INTEROPERABILITY], $tag);
   my Buf $buf .= allocate: 1024, 0;
   exif_entry_get_value($entry, $buf, 1024);
 }
@@ -230,7 +234,7 @@ method tags(Int $group! where 0 <= * < 5, :$tagdesc? --> Hash)
   }
 
   my Pointer $dummy .= new;
-  my ExifContent $content = $!exif."ifd$group"();
+  my ExifContent $content = $!exif.ifd[$group];
   exif_content_foreach_entry($content, &entrycallback, $dummy);
   %tags;
 }

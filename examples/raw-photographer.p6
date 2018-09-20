@@ -9,7 +9,7 @@ use Image::Libexif::Constants;
 
 sub show-tag(ExifData $d, $ifd, $tag)
 {
-  my ExifEntry $entry = exif_content_get_entry($d."ifd$ifd"(), $tag);
+  my ExifEntry $entry = exif_content_get_entry($d.ifd[$ifd], $tag);
   if $entry.defined {
     my $buf = Buf.new(1..1024);
     exif_entry_get_value($entry, $buf, $buf.elems);
@@ -51,8 +51,7 @@ sub MAIN($file! where { .IO.f // die "file '$file' not found" })
   try show-tag($ed, EXIF_IFD_EXIF, EXIF_TAG_USER_COMMENT);
   try show-tag($ed, EXIF_IFD_0, EXIF_TAG_IMAGE_DESCRIPTION);
   try show-tag($ed, EXIF_IFD_1, EXIF_TAG_IMAGE_DESCRIPTION);
-  my $idx = "ifd" ~ EXIF_IFD_0.value;
-  my $entry = exif_content_get_entry($ed."$idx"(), EXIF_TAG_MAKE);
+  my $entry = exif_content_get_entry($ed.ifd[EXIF_IFD_0], EXIF_TAG_MAKE);
   if $entry.defined {
     my $buf = Buf.new(1..64);
     if exif_entry_get_value($entry, $buf, $buf.elems) {

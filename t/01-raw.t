@@ -31,7 +31,7 @@ subtest {
   exif_data_set_byte_order($exif1, EXIF_BYTE_ORDER_MOTOROLA);
   cmp-ok exif_data_get_byte_order($exif1), '==', EXIF_BYTE_ORDER_MOTOROLA, 'set exif data byte order';
   is exif_ifd_get_name(EXIF_IFD_INTEROPERABILITY), 'Interoperability', 'get ifd name';
-  is exif_content_get_ifd($exif1.ifd0), 0, 'read ifd';
+  is exif_content_get_ifd($exif1.ifd[0]), 0, 'read ifd';
   exif_data_free($exif1);
 }, 'info';
 
@@ -48,15 +48,15 @@ subtest {
 }, 'data option';
 
 subtest {
-  is $exif.ifd0.count, 11, 'ifd0';
-  is $exif.ifd1.count,  6, 'ifd1';
-  is $exif.ifd2.count, 35, 'ifd2';
-  is $exif.ifd3.count,  0, 'ifd3';
-  is $exif.ifd4.count,  2, 'ifd4';
+  is $exif.ifd[0].count, 11, 'ifd0';
+  is $exif.ifd[1].count,  6, 'ifd1';
+  is $exif.ifd[2].count, 35, 'ifd2';
+  is $exif.ifd[3].count,  0, 'ifd3';
+  is $exif.ifd[4].count,  2, 'ifd4';
 }, 'number of tags';
 
 subtest {
-  my ExifEntry $entry = exif_content_get_entry($exif.ifd0, EXIF_TAG_MAKE);
+  my ExifEntry $entry = exif_content_get_entry($exif.ifd[0], EXIF_TAG_MAKE);
   isa-ok $entry, Image::Libexif::Raw::ExifEntry, 'get entry';
   cmp-ok $entry.tag, '==', EXIF_TAG_MAKE, 'tag number';
   cmp-ok $entry.format, '==', EXIF_FORMAT_ASCII, 'tag format';
@@ -80,7 +80,7 @@ subtest {
     }($entry, $file);
   }
   my Pointer $dummy .= new;
-  my ExifContent $content = $exif.ifd0;
+  my ExifContent $content = $exif.ifd[0];
   exif_content_foreach_entry($content, &callback, $dummy);
   is @collected.head, 't/sample01.jpg: FUJIFILM', 'exif_content_foreach_entry';
 
@@ -124,7 +124,7 @@ subtest {
   is exif_log_code_get_title(EXIF_LOG_CODE_CORRUPT_DATA), 'Corrupt data', 'get log title';
   is exif_log_code_get_message(EXIF_LOG_CODE_CORRUPT_DATA), 'The data provided does not follow the specification.',
       'get log message';
-  my ExifContent $content = $exif.ifd0;
+  my ExifContent $content = $exif.ifd[0];
   exif_content_log($content, $log);
   exif_log_free($log);
 }, 'log';
@@ -160,7 +160,7 @@ subtest {
 
 if AUTHOR {
   exif_data_dump($exif);
-  exif_content_dump($exif.ifd0, 2);
+  exif_content_dump($exif.ifd[0], 2);
 }
 
 done-testing;

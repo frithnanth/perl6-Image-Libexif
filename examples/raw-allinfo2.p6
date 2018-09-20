@@ -12,7 +12,6 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
       my Buf $buf .= allocate: 100, 0;
       say "$data: ",
           $entry.tag.fmt('0x%04x '),
-          ExifTag.^enum_from_value($entry.tag).fmt('%-39s '),
           exif_entry_get_value($entry, $buf, 100);
     }($entry, $file);
   }
@@ -21,7 +20,7 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
   $exif = exif_data_new_from_file($file);
   my Pointer $dummy .= new;
   for ^5 {
-    my ExifContent $content = $exif."ifd$_"();
+    my ExifContent $content = $exif.ifd[$_];
     exif_content_foreach_entry($content, &callback, $dummy);
   }
 

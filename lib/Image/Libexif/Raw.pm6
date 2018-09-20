@@ -1,6 +1,6 @@
 use v6;
 
-unit module Image::Libexif::Raw:ver<0.0.3>;
+unit module Image::Libexif::Raw:ver<0.1.0>;
 
 use NativeCall;
 use Image::Libexif::Constants;
@@ -30,11 +30,7 @@ class ExifContent is repr('CStruct') is export {
 }
 
 class ExifData is repr('CStruct') is export {
-  has ExifContent $.ifd0;
-  has ExifContent $.ifd1;
-  has ExifContent $.ifd2;
-  has ExifContent $.ifd3;
-  has ExifContent $.ifd4;
+  HAS ExifContent @.ifd[EXIF_IFD_COUNT] is CArray;
   has Pointer[uint8] $.data;
   has uint32 $.size;
   has ExifDataPrivate $.priv;
