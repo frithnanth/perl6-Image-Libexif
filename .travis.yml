@@ -6,7 +6,7 @@ os:
 language: perl6
 
 perl6:
-  - '2018.06'
+  - '2018.08'
 
 install:
   - rakudobrew build-zef && zef install .
