@@ -2,7 +2,7 @@
   "perl" : "6.c",
   "tags" : [ "image", "exif", "nativecall" ],
   "name" : "Image::Libexif",
-  "version" : "0.0.3",
+  "version" : "0.1.0",
   "api" : "1",
   "description" : "Manipulate image EXIF data",
   "depends" : [ "NativeHelpers::Blob" ],
