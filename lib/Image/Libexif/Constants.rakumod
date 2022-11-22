@@ -1,6 +1,6 @@
 use v6;
 
-unit module Image::Libexif::Constants:ver<0.1.0>:auth<zef:FRITH>;
+unit module Image::Libexif::Constants:ver<0.1.1>:auth<zef:FRITH>;
 
 enum ExifDataType is export (:EXIF_DATA_TYPE_UNCOMPRESSED_CHUNKY(0), :EXIF_DATA_TYPE_UNCOMPRESSED_PLANAR(1),
     :EXIF_DATA_TYPE_UNCOMPRESSED_YCC(2), :EXIF_DATA_TYPE_COMPRESSED(3), :EXIF_DATA_TYPE_COUNT(4),
