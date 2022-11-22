@@ -1,18 +1,33 @@
 {
-  "perl" : "6.c",
-  "tags" : [ "image", "exif", "nativecall" ],
-  "name" : "Image::Libexif",
-  "version" : "0.1.0",
-  "api" : "1",
-  "description" : "Manipulate image EXIF data",
-  "depends" : [ "NativeHelpers::Blob" ],
-  "test-depends" : [ "Test" ],
-  "provides" : {
-    "Image::Libexif::Constants" : "lib/Image/Libexif/Constants.pm6",
-    "Image::Libexif::Raw" : "lib/Image/Libexif/Raw.pm6",
-    "Image::Libexif" : "lib/Image/Libexif.pm6"
-  },
-  "authors" : [ "Fernando Santagata" ],
+  "api": "1",
+  "auth": "zef:FRITH",
+  "authors": [
+    "Fernando Santagata"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+    "NativeHelpers::Blob"
+  ],
+  "description": "High-level bindings to libexif",
   "license": "Artistic-2.0",
-  "source-url" : "git://github.com/frithnanth/perl6-Image-Libexif.git"
+  "name": "Image::Libexif",
+  "perl": "6.c",
+  "provides": {
+    "Image::Libexif": "lib/Image/Libexif.rakumod",
+    "Image::Libexif::Constants": "lib/Image/Libexif/Constants.rakumod",
+    "Image::Libexif::Raw": "lib/Image/Libexif/Raw.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "git://github.com/frithnanth/perl6-Image-Libexif.git",
+  "tags": [
+    "image",
+    "exif",
+    "nativecall"
+  ],
+  "test-depends": [
+    "Test"
+  ],
+  "version": "0.1.0"
 }

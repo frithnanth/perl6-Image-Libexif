@@ -1,0 +1,5 @@
+Revision history for Image-Libexif
+
+{{$NEXT}}
+    - Change file extensions to Raku standard
+    - Switch to zef ecosystem

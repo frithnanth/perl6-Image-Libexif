@@ -1,5 +1,6 @@
 use v6;
-unit class Image::Libexif:ver<0.1.0>;
+
+unit class Image::Libexif:ver<0.1.0>:auth<zef:FRITH>;
 
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
@@ -291,7 +292,7 @@ Image::Libexif - High-level bindings to libexif
 
 =head1 SYNOPSIS
 
-=begin code
+=begin code :lang<raku>
 
 use v6;
 
@@ -313,7 +314,7 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
 
 =end code
 
-=begin code
+=begin code :lang<raku>
 
 use v6;
 

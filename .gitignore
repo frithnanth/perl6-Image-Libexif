@@ -1,0 +1,6 @@
+.precomp/
+!t
+!t/test.tar.gz
+*.vim
+*.swp
+docs/
