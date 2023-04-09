@@ -233,7 +233,7 @@ $ zef install Image::Libexif
 To run the tests:
 
 =begin code
-$ prove -e "perl6 -Ilib"
+$ prove -e "raku -Ilib"
 =end code
 
 =head1 Author
