@@ -140,7 +140,7 @@ submethod BUILD(Str :$file?, Buf :$data?)
 {
   with $file {
     if $file.IO.f {
-      $!exif = exif_data_new_from_file $file;
+      $!exif = exif_data_new_from_file($file) // exif_data_new;
     } else {
       fail X::Libexif.new: errno => 1, error => "File $file not found";
     }
@@ -154,7 +154,7 @@ submethod BUILD(Str :$file?, Buf :$data?)
 method open(Str $file!)
 {
   fail X::Libexif.new: errno => 1, error => "File $file not found" if ! $file.IO.e;
-  $!exif = exif_data_new_from_file $file;
+  $!exif = exif_data_new_from_file($file) // exif_data_new;
   self;
 }
 
