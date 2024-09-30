@@ -165,12 +165,17 @@ Testing
 
 To run the tests:
 
-    $ prove -e "perl6 -Ilib"
+    $ prove -e "raku -Ilib"
 
 Author
 ======
 
 Fernando Santagata
+
+Contributions
+=============
+
+Many thanks to Lizmat.
 
 License
 =======

@@ -1,6 +1,7 @@
 Revision history for Image-Libexif
 
 {{$NEXT}}
+    - Make sure there always is a bare Exifdata object
 
 0.1.1  2022-11-22T21:03:11+01:00
     - Change file extensions to Raku standard

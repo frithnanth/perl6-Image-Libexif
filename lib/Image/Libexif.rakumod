@@ -450,6 +450,10 @@ $ prove -e "raku -Ilib"
 
 Fernando Santagata
 
+=head1 Contributions
+
+Many thanks to Lizmat.
+
 =head1 License
 
 The Artistic License 2.0
