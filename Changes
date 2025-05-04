@@ -1,6 +1,8 @@
 Revision history for Image-Libexif
 
 {{$NEXT}}
+    - Add more docs about libexif12
+    - Internal changes adding more flexibility
 
 0.1.2  2024-09-30T16:50:57+02:00
     - Make sure there always is a bare Exifdata object
