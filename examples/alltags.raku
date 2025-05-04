@@ -13,7 +13,7 @@ sub MAIN($file! where { .IO.f // die "file $file not found" })
   for ^EXIF_IFD_COUNT -> $group {
     say "Group $group: " ~ «'Image info' 'Camera info' 'Shoot info' 'GPS info' 'Interoperability info'»[$group];
     for %(@tags[$group]).kv -> $k, @v {
-      say "%tagnames{+$k}: @v[1] => @v[0]";
+      say "{ %tagnames{+$k} // '' }: { @v[1] // '' } => { @v[0] // '' }";
     }
   }
 }
