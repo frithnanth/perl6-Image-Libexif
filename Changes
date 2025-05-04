@@ -1,6 +1,8 @@
 Revision history for Image-Libexif
 
 {{$NEXT}}
+
+0.1.3  2025-05-04T12:07:16+02:00
     - Add more docs about libexif12
     - Internal changes adding more flexibility
 

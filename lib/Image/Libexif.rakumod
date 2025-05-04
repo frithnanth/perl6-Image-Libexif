@@ -1,6 +1,6 @@
 use v6;
 
-unit class Image::Libexif:ver<0.1.2>:auth<zef:FRITH>;
+unit class Image::Libexif:ver<0.1.3>:auth<zef:FRITH>;
 
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
