@@ -432,7 +432,15 @@ The module looks for a library called libexif.so.
 
 =head1 Installation
 
-To install it using zef (a module management tool):
+This module uses `libexif` for its workings. Be sure to have it installed on your system.
+For a Debian-like installation:
+
+=begin code
+$ sudo apt update
+$ sudo apt install libexif12
+=end code
+
+To install this module using zef (a module management tool):
 
 =begin code
 $ zef install Image::Libexif
@@ -443,7 +451,7 @@ $ zef install Image::Libexif
 To run the tests:
 
 =begin code
-$ prove -e "raku -Ilib"
+$ prove6
 =end code
 
 =head1 Author
