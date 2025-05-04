@@ -4,7 +4,7 @@ use lib 'lib';
 use Image::Libexif::Raw;
 use Image::Libexif::Constants;
 
-# Perl6 rendition of this C program:
+# Raku rendition of this C program:
 # https://github.com/libexif/libexif/blob/master/contrib/examples/photographer.c
 
 sub show-tag(ExifData $d, $ifd, $tag)

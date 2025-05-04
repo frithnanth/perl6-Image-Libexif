@@ -5,7 +5,7 @@ use Image::Libexif::Raw;
 use Image::Libexif::Constants;
 use NativeHelpers::Blob;
 
-# Perl6 rendition of this C program:
+# Raku rendition of this C program:
 # https://github.com/libexif/libexif/blob/master/contrib/examples/thumbnail.c
 
 #| This program extracts an EXIF thumbnail from an image and saves it into a new file (in the same directory as the original).
