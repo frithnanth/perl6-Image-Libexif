@@ -5,7 +5,17 @@ unit module Image::Libexif::Raw:ver<0.1.2>:auth<zef:FRITH>;
 use NativeCall;
 use Image::Libexif::Constants;
 
-constant LIB = ('exif', v12);
+sub LIB {
+  run('/sbin/ldconfig', '-p', :chomp, :out)
+    .out
+    .slurp(:close)
+    .split("\n")
+    .grep(/^ \s+ libexif\.so\. \d+ /)
+    .sort
+    .head
+    .comb(/\S+/)
+    .head;
+}
 
 class ExifDataPrivate is repr('CPointer') { * }
 class ExifMnoteData is repr('CPointer') { * }
