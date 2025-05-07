@@ -136,19 +136,23 @@ our %tagnames is export(:tagnames) =
   0xc4a5 => 'Print image matching',
   0xea1c => 'Padding';
 
-submethod BUILD(Str :$file?, Buf :$data?)
+multi submethod TWEAK(Str :$file!)
 {
-  with $file {
-    if $file.IO.f {
-      $!exif = exif_data_new_from_file($file) // exif_data_new;
-    } else {
-      fail X::Libexif.new: errno => 1, error => "File $file not found";
-    }
-  } orwith $data {
-    $!exif = exif_data_new_from_data nativecast(Pointer[uint8], $data), $data.bytes;
+  if $file.IO.f {
+    $!exif = exif_data_new_from_file($file);
   } else {
-    $!exif = exif_data_new;
+    fail X::Libexif.new: errno => 1, error => "File $file not found";
   }
+}
+
+multi submethod TWEAK(Buf :$data!)
+{
+  $!exif = exif_data_new_from_data nativecast(Pointer[uint8], $data), $data.bytes;
+}
+
+multi submethod TWEAK()
+{
+  $!exif = exif_data_new;
 }
 
 method open(Str $file!)
